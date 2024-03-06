@@ -4,6 +4,30 @@
 #include <gtest/gtest.h>
 #include "Matrix.h"
 
+TEST(Matrix, Indexing) {
+    std::array<std::array<int, 3>, 2> a{{{3, 4, 6},
+                                         {1, 2, 7}}};
+    Matrix<int, 2, 3> aM{a};
+
+    ASSERT_EQ(aM[0][0], 3);
+    ASSERT_EQ(aM[0][1], 4);
+    ASSERT_EQ(aM[0][2], 6);
+    ASSERT_EQ(aM[1][0], 1);
+    ASSERT_EQ(aM[1][1], 2);
+    ASSERT_EQ(aM[1][2], 7);
+}
+
+TEST(Matrix, Print) {
+    std::array<std::array<int, 3>, 2> a{{{3, 4, 6},
+                                         {1, 2, 7}}};
+    Matrix<int, 2, 3> aM{a};
+
+    std::stringstream ss;
+    ss << aM << std::endl;
+
+    EXPECT_EQ(ss.str(), "[[3, 4, 6],\n [1, 2, 7]]\n");
+}
+
 TEST(Matrix, Equ) {
     std::array<std::array<double, 3>, 2> a{{{3.3, 4.5, 6.0},
                                             {1.0, 2.9, 7.1}}};
@@ -67,6 +91,8 @@ TEST(Matrix, ScalMul) {
 
     Matrix<double, 2, 3> aM{a};
     Matrix<double, 2, 3> expected{exp};
+
+    std::cout << aM;
 
     EXPECT_TRUE(nearEqual(aM * 4.5, expected, 0.0001));
     aM *= 4.5;
@@ -143,4 +169,26 @@ TEST(Matrix, ScalSub) {
 
 TEST(Matrix, MatCopy) {
     EXPECT_EQ(5, 5);
+}
+
+TEST(Matrix, MatTranspose) {
+    std::array<std::array<double, 3>, 2> a{{{3.3, 4.5, 6.0},
+                                            {1.0, 2.9, 7.1}}};
+
+    Matrix<double, 2, 3> aM{a};
+    Matrix<double, 3, 2> bM = aM.T();
+
+    for (int row = 0; row < 2; ++row) {
+        for (int col = 0; col < 3; ++col) {
+            EXPECT_EQ(aM[row][col], bM[col][row]);
+        }
+    }
+
+    // Assert that they share memory
+    bM[0][1] = 4.1;
+    for (int row = 0; row < 2; ++row) {
+        for (int col = 0; col < 3; ++col) {
+            EXPECT_EQ(aM[row][col], bM[col][row]);
+        }
+    }
 }

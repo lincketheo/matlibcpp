@@ -66,7 +66,7 @@ template<typename Z, size_t M, size_t N>
 bool nearEqual(const Matrix<Z, M, N> &left, const Matrix<Z, M, N> &right, Z epsilon) {
     for (int row = 0; row < M; ++row) {
         for (int col = 0; col < N; ++col) {
-            if (std::abs(left.data[row][col] - right.data[row][col]) > epsilon) {
+            if (std::abs(left[row][col] - right[row][col]) > epsilon) {
                 return false;
             }
         }
