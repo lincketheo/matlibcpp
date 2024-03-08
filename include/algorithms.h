@@ -49,6 +49,18 @@ namespace mcpp {
 
     template<typename P, size_t R, size_t C>
     P min(const Matrix<P, R, C> &m);
+
+    template<typename P, size_t R, size_t C>
+    P trace(const Matrix<P, R, C> &m);
+
+    template<typename P, size_t R, size_t C>
+    void rotate_inline(Matrix<P, R, C> &m, std::size_t x, std::size_t y);
+
+    template<typename P, size_t R, size_t C>
+    void gaussJordan_inline(Matrix<P, R, C> &m);
+
+    template<typename P, size_t R, size_t C>
+    void gaussJordanRREF_inline(Matrix<P, R, C> &m);
 }
 
 #include "../src/algorithms.tpp"

@@ -173,5 +173,73 @@ namespace mcpp {
 
         return ret;
     }
+
+    template<typename P, size_t R, size_t C>
+    P trace(const Matrix<P, R, C> &m) {
+        P ret = m[0][0];
+        std::size_t i = 1;
+        while (i < C && i < R) {
+            ret += m[i][i];
+            i++;
+        }
+
+        return ret;
+    }
+
+    // TODO Test
+    template<typename P, size_t R, size_t C>
+    void rotate_inline(Matrix<P, R, C> &m, std::size_t x, std::size_t y, double theta) {
+        Matrix<P, R, R> rot;
+        rot[x][x] = std::cos(theta);
+        rot[y][x] = std::sin(theta);
+        rot[y][y] = std::cos(theta);
+        rot[x][y] = -std::sin(theta);
+        m += rot;
+    }
+
+    template<typename P, size_t R, size_t C>
+    void gaussJordan_inline(Matrix<P, R, C> &m) {
+        int i = 0;
+        int j = 0;
+        while (i < R && j < C) {
+            int s = 1;
+
+            // Ensure the first pivot is not 0
+            while (m[i][j] == 0 && i + s < R - 1) {
+                // swap rows i and s
+                auto temp = m[i];
+                m[i] = m[s];
+                m[s] = temp;
+            }
+
+            //
+            if (m[i][j] != 0) {
+                m[i] *= 1 / m[i][j];
+                for (int x = 1; i + x < R; ++x) {
+                    if (m[i + x][j] != 0) {
+                        m[x + i] -= (m[i] * m[i + x][j]);
+                    }
+                }
+            }
+            i++;
+            j++;
+        }
+    }
+
+    template<typename P, size_t R, size_t C>
+    void gaussJordanRREF_inline(Matrix<P, R, C> &m) {
+        gaussJordan_inline(m);
+        int i = std::min(R, C) - 1;
+        int j = i;
+        while (i >= 0) {
+            if (m[i][j] != 0) {
+                for (int x = 1; i - x >= 0; ++x) {
+                    m[i - x] = m[i - x] - (m[i] * m[i - x][j]);
+                }
+            }
+            i--;
+            j--;
+        }
+    }
 }
 

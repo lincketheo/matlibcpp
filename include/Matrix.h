@@ -42,6 +42,16 @@ namespace mcpp {
         public:
             Slice() = delete;
 
+            Slice(const Slice &s) {
+                isCol = false;
+                index = 0;
+                data = std::shared_ptr<std::array<P, C * R>>(new std::array<P, C * R>());
+                // Copy data over
+                for (int i = 0; i < C; ++i) {
+                    (*this)[i] = s[i];
+                }
+            }
+
             Slice(int _index, bool _isCol, std::shared_ptr<std::array<P, C * R>> _data);
 
             P &operator[](int i) {
@@ -59,6 +69,53 @@ namespace mcpp {
                 } else {
                     return (*data)[index * C + ii];
                 }
+            }
+
+            P operator[](int i) const {
+                int ii = i;
+                if (ii < 0) {
+                    ii += C;
+                }
+                if (ii >= C) {
+                    std::stringstream ss;
+                    ss << "Invalid col index: " << i << " for matrix with " << C << " cols";
+                    throw std::invalid_argument(ss.str());
+                }
+                if (isCol) {
+                    return (*data)[R * ii + index];
+                } else {
+                    return (*data)[index * C + ii];
+                }
+            }
+
+            // TODO test
+            Slice &operator*=(P f) {
+                for (int i = 0; i < C; ++i) {
+                    (*this)[i] *= f;
+                }
+                return (*this);
+            }
+
+            // TODO test
+            Slice operator*(P f) {
+                Slice ret = *this;
+                ret *= f;
+                return ret;
+            }
+
+            // TODO test
+            Slice &operator-=(const Slice &right) {
+                for (int i = 0; i < C; ++i) {
+                    (*this)[i] -= right[i];
+                }
+                return (*this);
+            }
+
+            // TODO test
+            Slice operator-(const Slice &right) {
+                Slice ret = *this;
+                ret -= right;
+                return ret;
             }
 
         private:

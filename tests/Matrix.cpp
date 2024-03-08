@@ -311,3 +311,49 @@ TEST(Matrix, MaxMin) {
     EXPECT_EQ(row, 1);
     EXPECT_EQ(col, 0);
 }
+
+TEST(Matrix, Trace) {
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+
+    EXPECT_DOUBLE_EQ(trace(aM), 6.2);
+
+    Matrix<double, 2, 2> bM{{3.3, 4.5},
+                            {1.0, 2.9}};
+
+    EXPECT_DOUBLE_EQ(trace(bM), 6.2);
+
+    Matrix<double, 3, 3> cM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1},
+                            {2.0, 3.9, 3.1}};
+
+    EXPECT_DOUBLE_EQ(trace(cM), 9.3);
+
+    Matrix<double, 4, 3> dM{{3.3, 4.5,  6.0},
+                            {1.0, 2.9,  7.1},
+                            {2.0, 3.9,  3.1},
+                            {5.0, 12.9, 1.1}};
+
+    EXPECT_DOUBLE_EQ(trace(dM), 9.3);
+}
+
+TEST(Matrix, GaussJordan) {
+    Matrix<double, 4, 6> aM{{1, 3,  -2, 4, 1, 7},
+                            {2, 6,  0,  5, 2, 5},
+                            {4, 11, 8,  0, 5, 3},
+                            {1, 3,  2,  1, 1, -2}};
+
+    gaussJordan_inline(aM);
+
+    std::cout << aM << std::endl;
+}
+
+TEST(Matrix, GaussJordanRREF) {
+    Matrix<double, 2, 3> aM{{1, 3, 7},
+                            {3, 4, 11}};
+
+    gaussJordanRREF_inline(aM);
+
+    std::cout << aM << std::endl;
+}
+
