@@ -18,7 +18,7 @@ target_link_libraries(
         test
         GTest::gtest_main
 )
-target_include_directories(test PUBLIC ../src)
+target_include_directories(test PUBLIC ../include)
 
 include(GoogleTest)
 gtest_discover_tests(test)

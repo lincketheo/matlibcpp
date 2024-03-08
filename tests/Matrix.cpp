@@ -4,10 +4,34 @@
 #include <gtest/gtest.h>
 #include "Matrix.h"
 
+using namespace mcpp;
+
+TEST(Matrix, ConstructorVal) {
+    // I know there's EXPECT_THROW, but the initializer lists are
+    // doing something weird, feel free to fix
+    try {
+        Matrix<int, 2, 3> aM{{1, 2, 3}};
+        FAIL();
+    } catch (std::invalid_argument &e) {
+        EXPECT_STREQ(e.what(), "Invalid constructor for Matrix with row size 2"
+                               " Got initializer list of row size: 1");
+    }
+
+    try {
+        Matrix<int, 2, 3> aM{{1, 2, 3},
+                             {4, 5}};
+        FAIL();
+    } catch (std::invalid_argument &e) {
+        EXPECT_STREQ(e.what(), "Invalid constructor for Matrix with col size 3"
+                               " Row: 1 of initializer list has col size 2");
+    }
+
+    Matrix<int, 2, 3> aM{{{1, 2, 3}, {4, 5, 6}}};
+}
+
 TEST(Matrix, Indexing) {
-    std::array<std::array<int, 3>, 2> a{{{3, 4, 6},
-                                         {1, 2, 7}}};
-    Matrix<int, 2, 3> aM{a};
+    Matrix<int, 2, 3> aM = {{3, 4, 6},
+                            {1, 2, 7}};
 
     ASSERT_EQ(aM[0][0], 3);
     ASSERT_EQ(aM[0][1], 4);
@@ -15,13 +39,72 @@ TEST(Matrix, Indexing) {
     ASSERT_EQ(aM[1][0], 1);
     ASSERT_EQ(aM[1][1], 2);
     ASSERT_EQ(aM[1][2], 7);
+
+    ASSERT_EQ(aM[-1][0], 1);
+    ASSERT_EQ(aM[0][-1], 6);
+    ASSERT_EQ(aM[1][-2], 2);
+    ASSERT_EQ(aM[-1][-3], 1);
+
+    ASSERT_EQ(aM.T()[-1][0], 6);
+    ASSERT_EQ(aM.T()[0][-1], 1);
+    ASSERT_EQ(aM.T()[1][-2], 4);
+    ASSERT_EQ(aM.T()[-2][-2], 4);
+
+    try {
+        aM[3][0];
+        FAIL();
+    } catch (std::invalid_argument &e) {
+        EXPECT_STREQ(e.what(), "Invalid row index: 3 for matrix with 2 rows");
+    }
+    try {
+        aM[0][3];
+        FAIL();
+    } catch (std::invalid_argument &e) {
+        EXPECT_STREQ(e.what(), "Invalid col index: 3 for matrix with 3 cols");
+    }
+    try {
+        aM[0][-4];
+        FAIL();
+    } catch (std::invalid_argument &e) {
+        EXPECT_STREQ(e.what(), "Invalid col index: -4 for matrix with 3 cols");
+    }
+    try {
+        aM[-4][0];
+        FAIL();
+    } catch (std::invalid_argument &e) {
+        EXPECT_STREQ(e.what(), "Invalid row index: -4 for matrix with 2 rows");
+    }
+
+    // Transpose
+    try {
+        aM.T()[0][3];
+        FAIL();
+    } catch (std::invalid_argument &e) {
+        EXPECT_STREQ(e.what(), "Invalid col index: 3 for matrix with 2 cols");
+    }
+    try {
+        aM.T()[3][0];
+        FAIL();
+    } catch (std::invalid_argument &e) {
+        EXPECT_STREQ(e.what(), "Invalid row index: 3 for matrix with 3 rows");
+    }
+    try {
+        aM.T()[-4][0];
+        FAIL();
+    } catch (std::invalid_argument &e) {
+        EXPECT_STREQ(e.what(), "Invalid row index: -4 for matrix with 3 rows");
+    }
+    try {
+        aM.T()[0][-4];
+        FAIL();
+    } catch (std::invalid_argument &e) {
+        EXPECT_STREQ(e.what(), "Invalid col index: -4 for matrix with 2 cols");
+    }
 }
 
 TEST(Matrix, Print) {
-    std::array<std::array<int, 3>, 2> a{{{3, 4, 6},
-                                         {1, 2, 7}}};
-    Matrix<int, 2, 3> aM{a};
-
+    Matrix<int, 2, 3> aM = {{3, 4, 6},
+                            {1, 2, 7}};
     std::stringstream ss;
     ss << aM << std::endl;
 
@@ -29,70 +112,49 @@ TEST(Matrix, Print) {
 }
 
 TEST(Matrix, Equ) {
-    std::array<std::array<double, 3>, 2> a{{{3.3, 4.5, 6.0},
-                                            {1.0, 2.9, 7.1}}};
-    std::array<std::array<double, 3>, 2> b{{{3.3, 4.5, 6.0},
-                                            {1.0, 2.9, 7.1}}};
-    std::array<std::array<double, 3>, 2> c{{{3.1, 4.5, 6.0},
-                                            {1.0, 2.9, 7.1}}};
-    std::array<std::array<double, 3>, 2> d{{{3.300000001, 4.5, 6.0},
-                                            {1.0, 2.9, 7.1}}};
-
-    Matrix<double, 2, 3> aM{a};
-    Matrix<double, 2, 3> bM{b};
-    Matrix<double, 2, 3> cM{c};
-    Matrix<double, 2, 3> dM{d};
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+    Matrix<double, 2, 3> bM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+    Matrix<double, 2, 3> cM{{3.1, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+    Matrix<double, 2, 3> dM{{3.30001, 4.5, 6.0},
+                            {1.0,     2.9, 7.1}};
 
     ASSERT_EQ(aM, aM);
     ASSERT_EQ(aM, bM);
     ASSERT_NE(aM, cM);
     ASSERT_NE(aM, dM);
     ASSERT_TRUE(nearEqual(aM, dM, 0.0001));
+    ASSERT_FALSE(nearEqual(aM, dM, 0.00001));
 }
 
 TEST(Matrix, MatMul) {
-    std::array<std::array<double, 3>, 2> a{{{3.3, 4.5, 6.0},
-                                            {1.0, 2.9, 7.1}}};
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+    Matrix<double, 3, 2> bM{{3.0, 4.1},
+                            {1.5, 2.2},
+                            {3.4, 4.3}};
+    Matrix<double, 3, 3> cM{{3.0, 4.5,  6.0},
+                            {1.0, 2.9,  7.1},
+                            {1.1, -0.9, 9.1}};
 
-    std::array<std::array<double, 2>, 3> b{{{3.0, 4.1},
-                                            {1.5, 2.2},
-                                            {3.4, 4.3}}};
+    Matrix<double, 2, 2> expected1{{37.05, 49.23},
+                                   {31.49, 41.01}};
+    Matrix<double, 2, 3> expected2{{21.0,  22.5, 106.35},
+                                   {13.71, 6.52, 91.2}};
 
-    std::array<std::array<double, 3>, 3> c{{{3.0, 4.5, 6.0},
-                                            {1.0, 2.9, 7.1},
-                                            {1.1, -0.9, 9.1}}};
-
-    std::array<std::array<double, 2>, 2> exp1{{{37.05, 49.23},
-                                               {31.49, 41.01}}};
-
-    std::array<std::array<double, 3>, 2> exp2{{{21.0, 22.5, 106.35},
-                                               {13.71, 6.52, 91.2}}};
-
-    Matrix<double, 2, 3> aM{a};
-    Matrix<double, 3, 2> bM{b};
-    Matrix<double, 3, 3> cM{c};
-
-    Matrix<double, 2, 2> expected1{exp1};
-    Matrix<double, 2, 3> expected2{exp2};
-
-    EXPECT_EQ(aM * bM, expected1);
+    EXPECT_TRUE(nearEqual(aM * bM, expected1, 0.0001));
 
     aM *= cM;
-    std::cout << aM << std::endl;
     EXPECT_TRUE(nearEqual(aM, expected2, 0.0001));
 }
 
 TEST(Matrix, ScalMul) {
-    std::array<std::array<double, 3>, 2> a{{{3.3, 4.5, 6.0},
-                                            {1.0, 2.9, 7.1}}};
-
-    std::array<std::array<double, 3>, 2> exp{{{14.85, 20.25, 27.0},
-                                              {4.5, 13.05, 31.95}}};
-
-    Matrix<double, 2, 3> aM{a};
-    Matrix<double, 2, 3> expected{exp};
-
-    std::cout << aM;
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+    Matrix<double, 2, 3> expected{{14.85, 20.25, 27.0},
+                                  {4.5,   13.05, 31.95}};
 
     EXPECT_TRUE(nearEqual(aM * 4.5, expected, 0.0001));
     aM *= 4.5;
@@ -100,18 +162,15 @@ TEST(Matrix, ScalMul) {
 }
 
 TEST(Matrix, MatAdd) {
-    std::array<std::array<double, 3>, 2> a{{{3.3, 4.5, 6.0},
-                                            {1.0, 2.9, 7.1}}};
+    Matrix<double, 2, 3> aMM{{1, 2, 3},
+                             {3, 4, 5}};
 
-    std::array<std::array<double, 3>, 2> b{{{4.1, 8.1, 1.0},
-                                            {4.5, 1.05, 3.95}}};
-
-    std::array<std::array<double, 3>, 2> exp{{{7.4, 12.6, 7.0},
-                                              {5.5, 3.95, 11.05}}};
-
-    Matrix<double, 2, 3> aM{a};
-    Matrix<double, 2, 3> bM{b};
-    Matrix<double, 2, 3> expected{exp};
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+    Matrix<double, 2, 3> bM{{4.1, 8.1,  1.0},
+                            {4.5, 1.05, 3.95}};
+    Matrix<double, 2, 3> expected{{7.4, 12.6, 7.0},
+                                  {5.5, 3.95, 11.05}};
 
     EXPECT_TRUE(nearEqual(aM + bM, expected, 0.0001));
     aM += bM;
@@ -119,14 +178,10 @@ TEST(Matrix, MatAdd) {
 }
 
 TEST(Matrix, ScalAdd) {
-    std::array<std::array<double, 3>, 2> a{{{3.3, 4.5, 6.0},
-                                            {1.0, 2.9, 7.1}}};
-
-    std::array<std::array<double, 3>, 2> exp{{{4.64, 5.84, 7.34},
-                                              {2.34, 4.24, 8.44}}};
-
-    Matrix<double, 2, 3> aM{a};
-    Matrix<double, 2, 3> expected{exp};
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+    Matrix<double, 2, 3> expected{{4.64, 5.84, 7.34},
+                                  {2.34, 4.24, 8.44}};
 
     EXPECT_TRUE(nearEqual(aM + 1.34, expected, 0.0001));
     aM += 1.34;
@@ -134,18 +189,12 @@ TEST(Matrix, ScalAdd) {
 }
 
 TEST(Matrix, MatSub) {
-    std::array<std::array<double, 3>, 2> a{{{3.3, 4.5, 6.0},
-                                            {1.0, 2.9, 7.1}}};
-
-    std::array<std::array<double, 3>, 2> b{{{4.1, 8.1, 1.0},
-                                            {4.5, 1.05, 3.95}}};
-
-    std::array<std::array<double, 3>, 2> exp{{{-0.8, -3.6, 5.0},
-                                              {-3.5, 1.85, 3.15}}};
-
-    Matrix<double, 2, 3> aM{a};
-    Matrix<double, 2, 3> bM{b};
-    Matrix<double, 2, 3> expected{exp};
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+    Matrix<double, 2, 3> bM{{4.1, 8.1,  1.0},
+                            {4.5, 1.05, 3.95}};
+    Matrix<double, 2, 3> expected{{-0.8, -3.6, 5.0},
+                                  {-3.5, 1.85, 3.15}};
 
     EXPECT_TRUE(nearEqual(aM - bM, expected, 0.0001));
     aM -= bM;
@@ -153,14 +202,10 @@ TEST(Matrix, MatSub) {
 }
 
 TEST(Matrix, ScalSub) {
-    std::array<std::array<double, 3>, 2> a{{{3.3, 4.5, 6.0},
-                                            {1.0, 2.9, 7.1}}};
-
-    std::array<std::array<double, 3>, 2> exp{{{1.96, 3.16, 4.66},
-                                              {-0.34, 1.56, 5.76}}};
-
-    Matrix<double, 2, 3> aM{a};
-    Matrix<double, 2, 3> expected{exp};
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+    Matrix<double, 2, 3> expected{{1.96,  3.16, 4.66},
+                                  {-0.34, 1.56, 5.76}};
 
     EXPECT_TRUE(nearEqual(aM - 1.34, expected, 0.0001));
     aM -= 1.34;
@@ -168,14 +213,20 @@ TEST(Matrix, ScalSub) {
 }
 
 TEST(Matrix, MatCopy) {
-    EXPECT_EQ(5, 5);
+    Matrix<double, 2, 3> aM{{1.96,  3.16, 4.66},
+                            {-0.34, 1.56, 5.76}};
+    auto bM = aM;
+
+    EXPECT_TRUE(nearEqual(aM, bM, 0.0001));
+
+    // Assert that they don't share memory
+    bM[0][0] = 3.1;
+    EXPECT_FALSE(nearEqual(aM, bM, 0.0001));
 }
 
 TEST(Matrix, MatTranspose) {
-    std::array<std::array<double, 3>, 2> a{{{3.3, 4.5, 6.0},
-                                            {1.0, 2.9, 7.1}}};
-
-    Matrix<double, 2, 3> aM{a};
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
     Matrix<double, 3, 2> bM = aM.T();
 
     for (int row = 0; row < 2; ++row) {
@@ -184,11 +235,79 @@ TEST(Matrix, MatTranspose) {
         }
     }
 
-    // Assert that they share memory
+    // Assert that they DO share memory
     bM[0][1] = 4.1;
     for (int row = 0; row < 2; ++row) {
         for (int col = 0; col < 3; ++col) {
             EXPECT_EQ(aM[row][col], bM[col][row]);
         }
     }
+}
+
+TEST(Matrix, PNorm) {
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+    EXPECT_TRUE(abs(pNorm(aM, 2) - 11.2676528168) < 0.0001);
+    EXPECT_TRUE(abs(pNorm(aM, -1) - 0.45922287992) < 0.0001);
+    EXPECT_TRUE(abs(pNorm(aM, 0.5) - 138.178178396) < 0.0001);
+}
+
+TEST(Matrix, Normalize) {
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+    auto aMCopy = aM;
+    normalize_inline(aMCopy, 2);
+    EXPECT_TRUE(abs(pNorm(aMCopy, 2) - 1) < 0.0001);
+
+    aMCopy = aM;
+    normalize_inline(aMCopy, 0.1);
+    EXPECT_TRUE(abs(pNorm(aMCopy, 0.1) - 1) < 0.0001);
+
+    aMCopy = aM;
+    normalize_inline(aMCopy, -1);
+    EXPECT_TRUE(abs(pNorm(aMCopy, -1) - 1) < 0.0001);
+
+    aMCopy = aM;
+    normalize_inline(aMCopy, -1);
+    EXPECT_FALSE(abs(pNorm(aMCopy, 2) - 1) < 0.0001);
+}
+
+TEST(Matrix, HasNanInf) {
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+    Matrix<double, 2, 3> bM{{3.3, INFINITY, 6.0},
+                            {1.0, 2.9,      7.1}};
+    Matrix<double, 2, 3> cM{{3.3, NAN, 6.0},
+                            {1.0, 2.9, 7.1}};
+    Matrix<double, 2, 3> dM{{3.3, NAN,      6.0},
+                            {1.0, INFINITY, 7.1}};
+
+    EXPECT_FALSE(hasNan(aM));
+    EXPECT_FALSE(hasInf(aM));
+
+    EXPECT_FALSE(hasNan(bM));
+    EXPECT_TRUE(hasInf(bM));
+
+    EXPECT_TRUE(hasNan(cM));
+    EXPECT_FALSE(hasInf(cM));
+
+    EXPECT_TRUE(hasNan(dM));
+    EXPECT_TRUE(hasInf(dM));
+}
+
+TEST(Matrix, MaxMin) {
+    Matrix<double, 2, 3> aM{{3.3, 4.5, 6.0},
+                            {1.0, 2.9, 7.1}};
+
+    EXPECT_EQ(max(aM), 7.1);
+    EXPECT_EQ(min(aM), 1.0);
+
+    std::size_t row, col;
+    argMax(aM, row, col);
+    EXPECT_EQ(row, 1);
+    EXPECT_EQ(col, 2);
+
+    argMin(aM, row, col);
+    EXPECT_EQ(row, 1);
+    EXPECT_EQ(col, 0);
 }
