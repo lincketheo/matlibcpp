@@ -1,11 +1,11 @@
 
-#include <GenericMatrixSlice.h>
+#include <MatrixSlice.h>
 #include <sstream>
 
 namespace mcpp {
-    ////////////////////////// GenericMatrixSlice
+    ////////////////////////// MatrixSlice
     template<typename P, std::size_t R, std::size_t C>
-    GenericMatrixSlice<P, R, C>::GenericMatrixSlice(int _index, bool _isCol,
+    MatrixSlice<P, R, C>::MatrixSlice(int _index, bool _isCol,
                                                     std::shared_ptr<std::array<P, C * R>> _data) {
         index = _index;
         isCol = _isCol;
@@ -13,7 +13,7 @@ namespace mcpp {
     }
 
     template<typename P, std::size_t R, std::size_t C>
-    P &GenericMatrixSlice<P, R, C>::operator[](int i) {
+    P &MatrixSlice<P, R, C>::operator[](int i) {
         int ii = i;
         if (ii < 0) {
             ii += C;
@@ -31,7 +31,7 @@ namespace mcpp {
     }
 
     template<typename P, std::size_t R, std::size_t C>
-    P GenericMatrixSlice<P, R, C>::operator[](int i) const {
+    P MatrixSlice<P, R, C>::operator[](int i) const {
         int ii = i;
         if (ii < 0) {
             ii += C;
@@ -49,7 +49,7 @@ namespace mcpp {
     }
 
     template<typename P, std::size_t R, std::size_t C>
-    GenericMatrixSlice<P, R, C> &GenericMatrixSlice<P, R, C>::operator*=(P f) {
+    MatrixSlice<P, R, C> &MatrixSlice<P, R, C>::operator*=(P f) {
         for (int i = 0; i < C; ++i) {
             (*this)[i] *= f;
         }
@@ -57,8 +57,8 @@ namespace mcpp {
     }
 
     template<typename P, std::size_t R, std::size_t C>
-    GenericMatrixSlice<P, R, C> &GenericMatrixSlice<P, R, C>::operator=(
-            const GenericMatrixSlice &right
+    MatrixSlice<P, R, C> &MatrixSlice<P, R, C>::operator=(
+            const MatrixSlice &right
     ) {
         for (int i = 0; i < C; ++i) {
             (*this)[i] = right[i];
@@ -67,15 +67,15 @@ namespace mcpp {
     }
 
     template<typename P, std::size_t R, std::size_t C>
-    GenericMatrixSlice<P, R, C> GenericMatrixSlice<P, R, C>::operator*(P f) {
-        GenericMatrixSlice ret = *this;
+    MatrixSlice<P, R, C> MatrixSlice<P, R, C>::operator*(P f) {
+        MatrixSlice ret = *this;
         ret *= f;
         return ret;
     }
 
     template<typename P, std::size_t R, std::size_t C>
-    GenericMatrixSlice<P, R, C> &GenericMatrixSlice<P, R, C>::operator-=(
-            const GenericMatrixSlice &right
+    MatrixSlice<P, R, C> &MatrixSlice<P, R, C>::operator-=(
+            const MatrixSlice &right
     ) {
         for (int i = 0; i < C; ++i) {
             (*this)[i] -= right[i];
@@ -84,10 +84,10 @@ namespace mcpp {
     }
 
     template<typename P, std::size_t R, std::size_t C>
-    GenericMatrixSlice<P, R, C> GenericMatrixSlice<P, R, C>::operator-(
-            const GenericMatrixSlice &right
+    MatrixSlice<P, R, C> MatrixSlice<P, R, C>::operator-(
+            const MatrixSlice &right
     ) {
-        GenericMatrixSlice ret = *this;
+        MatrixSlice ret = *this;
         ret -= right;
         return ret;
     }

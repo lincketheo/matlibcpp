@@ -12,7 +12,7 @@ enable_testing()
 
 add_executable(
         test
-        GenericMatrix.cpp
+        Matrix.cpp
 )
 target_link_libraries(
         test

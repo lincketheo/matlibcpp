@@ -13,30 +13,30 @@ namespace mcpp {
  * as if they're contiguous
  */
     template<typename P, std::size_t R, std::size_t C>
-    class GenericMatrixSlice {
+    class MatrixSlice {
     public:
-        GenericMatrixSlice() = delete;
+        MatrixSlice() = delete;
 
-        GenericMatrixSlice(int _index, bool _isCol, std::shared_ptr<std::array<P, C * R>> _data);
+        MatrixSlice(int _index, bool _isCol, std::shared_ptr<std::array<P, C * R>> _data);
 
         P &operator[](int i);
 
         P operator[](int i) const;
 
         // TODO test
-        GenericMatrixSlice &operator*=(P f);
+        MatrixSlice &operator*=(P f);
 
         // TODO test
-        GenericMatrixSlice &operator=(const GenericMatrixSlice &right);
+        MatrixSlice &operator=(const MatrixSlice &right);
 
         // TODO test
-        GenericMatrixSlice operator*(P f);
+        MatrixSlice operator*(P f);
 
         // TODO test
-        GenericMatrixSlice &operator-=(const GenericMatrixSlice &right);
+        MatrixSlice &operator-=(const MatrixSlice &right);
 
         // TODO test
-        GenericMatrixSlice operator-(const GenericMatrixSlice &right);
+        MatrixSlice operator-(const MatrixSlice &right);
 
     private:
         bool isCol;
@@ -45,6 +45,6 @@ namespace mcpp {
     };
 }
 
-#include "../src/GenericMatrixSlice.tpp"
+#include "../src/MatrixSlice.tpp"
 
 #endif //MATLIBCPP_GENERICMATRIXSLICE_H

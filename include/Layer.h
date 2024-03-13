@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 #include <memory>
-#include <GenericMatrix.h>
+#include <Matrix.h>
 
 class Layer {
 
