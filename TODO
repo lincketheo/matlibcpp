@@ -1,0 +1,16 @@
+# Matrix / Linear Algebra
+1. Test Matrix Slice Operator *=
+2. Test Matrix Slice Operator =
+3. Test Matrix Slice Operator *
+4. Test Matrix Slice Operator -=
+5. Test Matrix Slice Operator -
+6. Make Template library better - clean up imports so they make sense and learn about template libraries
+7. Make GaussJordan work
+8. Make GaussJordan RREF Work
+9. Test GaussJordan
+10. Test GaussJordan RREF
+11. Write equivalent operators for array of matrices
+12. Test (11)
+
+# Network
+1. Abstract out network

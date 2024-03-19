@@ -23,19 +23,19 @@ namespace mcpp {
 
         P operator[](int i) const;
 
-        // TODO test
+        // TODO test (1)
         MatrixSlice &operator*=(P f);
 
-        // TODO test
+        // TODO test (2)
         MatrixSlice &operator=(const MatrixSlice &right);
 
-        // TODO test
+        // TODO test (3)
         MatrixSlice operator*(P f);
 
-        // TODO test
+        // TODO test (4)
         MatrixSlice &operator-=(const MatrixSlice &right);
 
-        // TODO test
+        // TODO test (5)
         MatrixSlice operator-(const MatrixSlice &right);
 
     private:

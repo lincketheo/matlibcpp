@@ -13,6 +13,7 @@ enable_testing()
 add_executable(
         test
         Matrix.cpp
+        Dense.cpp
 )
 target_link_libraries(
         test
